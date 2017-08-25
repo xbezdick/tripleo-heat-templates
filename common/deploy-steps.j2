@@ -12,6 +12,7 @@
 {% set deploy_steps_max = 6 -%}
 {% set update_steps_max = 6 -%}
 {% set upgrade_steps_max = 6 -%}
+{% set skip_level_upgrade_steps_max = 6 -%}
 
 heat_template_version: pike
 
@@ -354,4 +355,33 @@ outputs:
               with_sequence: count={{deploy_steps_max-1}}
               loop_control:
                 loop_var: step
-
+      skip_level_upgrade_steps_tasks: |
+{%- for role in roles %}
+            - include: {{role.name}}/skip_level_upgrade_tasks.yaml
+              when: role_name == '{{role.name}}'
+{%- endfor %}
+      skip_level_upgrade_release_tasks: |
+            - include: skip_level_upgrade_steps_tasks.yaml
+              with_sequence: count={{skip_level_upgrade_steps_max-1}}
+              loop_control:
+                loop_var: step
+      skip_level_upgrade_steps_playbook: |
+        - hosts: overcloud
+          tasks:
+            # NOTE(lyarwood): skip via N->O and O->P only
+            - include: skip_level_upgrade_release_tasks.yaml
+              vars:
+                release: '{{item}}'
+            # FIXME: These shouldn't be hardcoded to allow N to N+2
+              with_items:
+                - 'ocata'
+                - 'pike'
+            # NOTE(lyarwood): P->Q
+            - include: upgrade_steps_tasks.yaml
+              with_sequence: count={{upgrade_steps_max-1}}
+              loop_control:
+                loop_var: step
+            - include: deploy_steps_tasks.yaml
+              with_sequence: count={{deploy_steps_max-1}}
+              loop_control:
+                loop_var: step

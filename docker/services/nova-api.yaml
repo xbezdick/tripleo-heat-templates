@@ -225,3 +225,7 @@ outputs:
         - name: Stop and disable nova_api service
           tags: step2
           service: name=openstack-nova-api state=stopped enabled=no
+      skip_upgrade_tasks:
+        - name: Example Ocata step 2 task
+          command: /bin/foo bar
+          when: step == 2 and release == 'ocata'
