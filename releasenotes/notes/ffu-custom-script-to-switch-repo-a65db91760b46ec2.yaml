@@ -1,0 +1,20 @@
+---
+features:
+
+  - The user can now use a custom script to switch repo during the
+    fast forward upgrade.  The script should take the name of the
+    release as the first argument.  Here is an example that describe
+    the interface.
+
+        #!/bin/bash
+        case $1 in
+          ocata)
+            curl -o /etc/yum.repos.d/ocata.repo http://somewhere.com/my-Ocata.repo;
+            yum clean metadata;
+          pike)
+            curl -o /etc/yum.repos.d/pike.repo http://somewhere.com/my-Pike.repo;
+            yum clean metadata;
+          *)
+            echo "unknown release $1" >&2
+            exit 1
+        esac
