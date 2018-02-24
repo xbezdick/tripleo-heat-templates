@@ -186,6 +186,6 @@ outputs:
             awk '{print $2}' |\
             xargs pcs resource disable
           when:
-            - step|int == 3
+            - step|int == 2
             - release == 'ocata'
             - is_bootstrap_node|bool
