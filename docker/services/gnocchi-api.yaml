@@ -304,7 +304,7 @@ outputs:
             - httpd_running|bool
           service: name=httpd state=stopped enabled=no
         - name: Update gnocchi packages
-          yum: name=openstack-gnocchi* state=latest
+          shell: yum -y update openstack-gnocchi*
           when:
             - step|int == 6
             - is_bootstrap_node|bool

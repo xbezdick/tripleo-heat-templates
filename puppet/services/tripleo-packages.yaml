@@ -94,7 +94,7 @@ outputs:
             - os_net_config_has_config.rc == 0
         - name: Update all packages
           when: step|int == 3
-          yum: name=* state=latest
+          shell: yum -y update
       update_tasks:
         - name: Check for existing yum.pid
           stat:  path=/var/run/yum.pid
